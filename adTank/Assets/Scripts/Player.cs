@@ -12,11 +12,15 @@ public class Player : MonoBehaviour
     private bool isDefended=true;
 
     // 引用
-    public Sprite[] tankSprite;
     private SpriteRenderer sr;
+    public Sprite[] tankSprite;
     public GameObject bulletPrefab;
     public GameObject explosionPrefab;
     public GameObject defendEffectPrefab;
+    
+    public AudioSource moveAudio;
+    public AudioClip[] tankAudio;
+
     private void Awake() {
         sr = GetComponent<SpriteRenderer>();
     }
@@ -39,19 +43,23 @@ public class Player : MonoBehaviour
                 defendEffectPrefab.SetActive(false);
             }
         }
+    }
+    private void FixedUpdate() {
+        if (PlayerManager.Instance.isDefeat)
+        {
+            return;
+        }
 
 
+        // 固定物理帧生命周期函数，保证每一帧的刚体受力相等,防止抖动效果。
+        TankMove();
+        // TankAttack();
         // 攻击CD
         if(timeVal >= 0.8f) {
             TankAttack();
         } else {
-            timeVal += Time.deltaTime;
+            timeVal += Time.fixedDeltaTime;
         }
-    }
-    private void FixedUpdate() {
-        // 固定物理帧生命周期函数，保证每一帧的刚体受力相等,防止抖动效果。
-        TankMove();
-        // TankAttack();
 
     }
 
@@ -76,6 +84,25 @@ public class Player : MonoBehaviour
             bullutEulerAngules = new Vector3(0, 0, 0);
         }
 
+        if (Mathf.Abs(v)>0.05f)
+        {
+            moveAudio.clip = tankAudio[1];
+            
+            if (!moveAudio.isPlaying)
+            {
+                moveAudio.Play();
+            }
+        }
+        else
+        {
+            moveAudio.clip = tankAudio[0];
+
+            if (!moveAudio.isPlaying)
+            {
+                moveAudio.Play();
+            }
+        }
+
         if (v != 0) {
             // 上下优先级高，防止多方向同时移动
             return;
@@ -91,6 +118,26 @@ public class Player : MonoBehaviour
             sr.sprite = tankSprite[1];
             bullutEulerAngules = new Vector3(0, 0, -90);
         }
+
+        if (Mathf.Abs(h) > 0.05f)
+        {
+            moveAudio.clip = tankAudio[1];
+
+            if (!moveAudio.isPlaying)
+            {
+                moveAudio.Play();
+            }
+        }
+        else
+        {
+            moveAudio.clip = tankAudio[0];
+
+            if (!moveAudio.isPlaying)
+            {
+                moveAudio.Play();
+            }
+        }
+
     }
 
     private void Die() {
@@ -99,6 +146,7 @@ public class Player : MonoBehaviour
             return;
         }
 
+        PlayerManager.Instance.isDead = true;
         // 产生爆炸特效
         Instantiate(explosionPrefab, transform.position, transform.rotation);
 

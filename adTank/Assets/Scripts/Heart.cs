@@ -6,6 +6,9 @@ public class Heart : MonoBehaviour
 {   
     private SpriteRenderer sr;
     public Sprite brokenSprite;
+    public GameObject explosionPrefab;
+    public AudioClip dieAudio;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,5 +23,8 @@ public class Heart : MonoBehaviour
 
     public void Die() {
         sr.sprite = brokenSprite;
+        Instantiate(explosionPrefab, transform.position, transform.rotation);
+        PlayerManager.Instance.isDefeat = true;
+        AudioSource.PlayClipAtPoint(dieAudio, transform.position);
     }
 }

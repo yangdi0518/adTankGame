@@ -24,15 +24,23 @@ public class Bullet : MonoBehaviour
             case "Tank":
                 if(!isPlayerBullet) {
                 collision.SendMessage("Die");   
+                Destroy(gameObject);
                 }
                 break;
             case "Enemy":
+                if(isPlayerBullet) {
+                collision.SendMessage("Die");   
+                Destroy(gameObject);
+                }
                 break;
             case "Wall":
                 Destroy(collision.gameObject);
                 Destroy(gameObject);
                 break;
             case "Barrier":
+                if (isPlayerBullet) {
+                    collision.SendMessage("PlayAudio");
+                }
                 Destroy(gameObject);
                 break;
             case "Heart":
